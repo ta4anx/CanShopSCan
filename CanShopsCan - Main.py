@@ -11,6 +11,7 @@
 import sqlite3
 import time
 import Adafruit_CharLCD as LCD
+import pygame
 import RPi.GPIO as GPIO
 
 # Initialize LCD
@@ -46,18 +47,41 @@ def read_barcode():
     barcode = input("Enter barcode: ")
     return barcode
 
+    # Initialize pygame mixer
+    pygame.mixer.init()
 
+    # Load the sound file
+    sound_file = "barcode_sound.wav"
+    sound = pygame.mixer.Sound(sound_file)
+
+    # Function to play the sound
+    def play_sound():
+        sound.play()
+
+    # Add item to the shopping list
+    def add_item(barcode):
+        # Add your code here to retrieve item details from the barcode
+        name = input("Enter item name: ")
+        # Insert the item into the database
+        cursor.execute('''
+            INSERT INTO items (name)
+            VALUES (?)
+        ''', (name,))
+        conn.commit()
+        # Play the sound
+        play_sound()
+        # Display item added message on LCD
+        lcd.clear()
+        lcd.message('Item added to\nshopping list')
 # Add item to the shopping list
 def add_item(barcode):
     # Add your code here to retrieve item details from the barcode
     name = input("Enter item name: ")
-    quantity = int(input("Enter item quantity: "))
-
     # Insert the item into the database
     cursor.execute('''
-        INSERT INTO items (name, quantity)
-        VALUES (?, ?)
-    ''', (name, quantity))
+        INSERT INTO items (name)
+        VALUES (?)
+    ''', (name,))
     conn.commit()
 
     # Display item added message on LCD
